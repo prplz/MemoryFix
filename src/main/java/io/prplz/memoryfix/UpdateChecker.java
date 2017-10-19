@@ -11,11 +11,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.function.Consumer;
 
 public class UpdateChecker extends Thread {
 
-    private final MemoryFix mod;
     private final String url;
+    private final Consumer<UpdateResponse> callback;
     private final Gson gson = new GsonBuilder()
             .registerTypeHierarchyAdapter(IChatComponent.class, new IChatComponent.Serializer())
             .registerTypeHierarchyAdapter(ChatStyle.class, new ChatStyle.Serializer())
@@ -23,9 +24,9 @@ public class UpdateChecker extends Thread {
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
 
-    public UpdateChecker(MemoryFix mod) {
-        this.mod = mod;
-        url = "https://mods.purple.services/update/check/" + MemoryFix.MOD_NAME + "/" + MemoryFix.VERSION;
+    public UpdateChecker(String url, Consumer<UpdateResponse> callback) {
+        this.url = url;
+        this.callback = callback;
     }
 
     @Override
@@ -33,7 +34,11 @@ public class UpdateChecker extends Thread {
         for (int retry = 0; retry < 3; retry++) {
             try {
                 UpdateResponse response = check(url);
-                mod.setUpdateMessage(response.updateMessage);
+                try {
+                    callback.accept(response);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             } catch (Exception ex) {
                 System.out.println("GET " + url + " failed:");
                 System.out.println(ex.toString());
@@ -48,9 +53,17 @@ public class UpdateChecker extends Thread {
         }
     }
 
-    private static class UpdateResponse {
+    public static class UpdateResponse {
 
-        IChatComponent updateMessage;
+        private final IChatComponent updateMessage;
+
+        public UpdateResponse(IChatComponent updateMessage) {
+            this.updateMessage = updateMessage;
+        }
+
+        public IChatComponent getUpdateMessage() {
+            return updateMessage;
+        }
     }
 
     private UpdateResponse check(String url) throws IOException {

@@ -13,28 +13,36 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
+import java.util.Properties;
 
 public class MemoryFix extends DummyModContainer {
 
-    public static final String MOD_ID = "memoryfix";
-    public static final String MOD_NAME = "MemoryFix";
-    public static final String VERSION = "0.1";
+    private final String modId = "memoryfix";
+    private final String modName = "MemoryFix";
+    private final String version;
+    private final String updateUrl;
     private int messageDelay = 0;
     private IChatComponent updateMessage;
 
     public MemoryFix() {
         super(new ModMetadata());
         ModMetadata meta = getMetadata();
-        meta.modId = MOD_ID;
-        meta.name = MOD_NAME;
-        meta.version = VERSION;
+        meta.modId = modId;
+        meta.name = modName;
+        Properties properties = new Properties();
+        try (InputStream in = MemoryFix.class.getClassLoader().getResourceAsStream("version.properties")) {
+            properties.load(in);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+        version = properties.getProperty("version");
+        updateUrl = properties.getProperty("updateUrl") + modName + "/" + version;
+        meta.version = version;
         meta.authorList = Collections.singletonList("prplz");
         meta.url = "https://prplz.io/memoryfix";
-    }
-
-    public void setUpdateMessage(IChatComponent updateMessage) {
-        this.updateMessage = updateMessage;
     }
 
     @Override
@@ -50,7 +58,8 @@ public class MemoryFix extends DummyModContainer {
         MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
 
-        new UpdateChecker(this).start();
+        UpdateChecker updater = new UpdateChecker(updateUrl, res -> updateMessage = res.getUpdateMessage());
+        updater.start();
     }
 
     @SubscribeEvent

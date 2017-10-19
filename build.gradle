@@ -37,16 +37,21 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    inputs.property "updateUrl", updateUrl
 
     from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
+        include '**/*.info'
+        include '**/*.properties'
 
-        expand "version": project.version, "mcversion": project.minecraft.version
+        expand(
+                "version": project.version,
+                "updateUrl": updateUrl
+        )
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
+        exclude '**/*.info'
+        exclude '**/*.properties'
     }
 }
 
