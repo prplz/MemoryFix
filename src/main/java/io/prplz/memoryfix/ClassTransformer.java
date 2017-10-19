@@ -25,7 +25,7 @@ public class ClassTransformer implements IClassTransformer {
                 @Override
                 public String map(String typeName) {
                     if (typeName.equals("CapeUtils$1")) {
-                        return "io/prplz/memoryfix/CapeImageBuffer";
+                        return "io.prplz.memoryfix.CapeImageBuffer".replace('.', '/');
                     }
                     return typeName;
                 }

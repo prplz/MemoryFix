@@ -49,6 +49,7 @@ public class UpdateChecker extends Thread {
     }
 
     private static class UpdateResponse {
+
         IChatComponent updateMessage;
     }
 

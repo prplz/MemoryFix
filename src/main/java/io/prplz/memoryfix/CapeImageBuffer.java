@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import java.awt.image.BufferedImage;
 import java.lang.ref.WeakReference;
 
+@SuppressWarnings("unused")
 public class CapeImageBuffer implements IImageBuffer {
 
     public ImageBufferDownload imageBufferDownload;
@@ -15,7 +16,7 @@ public class CapeImageBuffer implements IImageBuffer {
     public final ResourceLocation resourceLocation;
 
     public CapeImageBuffer(AbstractClientPlayer player, ResourceLocation resourceLocation) {
-        playerRef = new WeakReference<AbstractClientPlayer>(player);
+        playerRef = new WeakReference<>(player);
         this.resourceLocation = resourceLocation;
         imageBufferDownload = new ImageBufferDownload();
     }

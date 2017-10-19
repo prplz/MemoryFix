@@ -43,6 +43,7 @@ public class MemoryFix extends DummyModContainer {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     @Subscribe
     public void init(FMLInitializationEvent event) {
         // register the old event bus too, some versions use this (thanks sem)
