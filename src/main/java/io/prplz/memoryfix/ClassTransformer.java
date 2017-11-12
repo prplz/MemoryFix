@@ -25,6 +25,9 @@ public class ClassTransformer implements IClassTransformer {
             return transformCapeImageBuffer(bytes);
         } else if (transformedName.equals("net.minecraft.client.resources.AbstractResourcePack")) {
             return transformAbstractResourcePack(bytes);
+        } else if (transformedName.equals("net.minecraft.client.Minecraft")) {
+            // Remove System.gc calls (they all happen in this class)
+            return transformMinecraft(bytes);
         }
         return bytes;
     }
@@ -95,6 +98,29 @@ public class ClassTransformer implements IClassTransformer {
                                 "io.prplz.memoryfix.ResourcePackImageScaler".replace('.', '/'),
                                 "scalePackImage",
                                 "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;"));
+                    }
+                }
+            }
+        }
+
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        classNode.accept(classWriter);
+        return classWriter.toByteArray();
+    }
+
+    private byte[] transformMinecraft(byte[] bytes) {
+        ClassReader classReader = new ClassReader(bytes);
+        ClassNode classNode = new ClassNode();
+        classReader.accept(classNode, ClassReader.EXPAND_FRAMES);
+
+        for (MethodNode method : classNode.methods) {
+            Iterator<AbstractInsnNode> iter = method.instructions.iterator();
+            while (iter.hasNext()) {
+                AbstractInsnNode insn = iter.next();
+                if (insn.getOpcode() == Opcodes.INVOKESTATIC) {
+                    MethodInsnNode methodInsn = (MethodInsnNode) insn;
+                    if (methodInsn.owner.equals("java/lang/System") && methodInsn.name.equals("gc")) {
+                        iter.remove();
                     }
                 }
             }
