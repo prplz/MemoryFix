@@ -26,6 +26,8 @@ minecraft {
     version = project.forgeVersion
     runDir = "run"
     mappings = project.mcpVersion
+    coreMod = "io.prplz.memoryfix.FMLLoadingPlugin"
+    replace "%%UPDATE_URL%%": "$updateUrl/$modBaseName/$project.version"
 }
 
 repositories {
@@ -37,26 +39,19 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "updateUrl", updateUrl
 
     from(sourceSets.main.resources.srcDirs) {
-        include '**/*.info'
-        include '**/*.properties'
-
-        expand(
-                "version": project.version,
-                "updateUrl": updateUrl
-        )
+        include "mcmod.info"
+        expand "version": project.version
     }
 
     from(sourceSets.main.resources.srcDirs) {
-        exclude '**/*.info'
-        exclude '**/*.properties'
+        exclude "mcmod.info"
     }
 }
 
 jar {
     manifest {
-        attributes("FMLCorePlugin": "io.prplz.memoryfix.FMLLoadingPlugin")
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }

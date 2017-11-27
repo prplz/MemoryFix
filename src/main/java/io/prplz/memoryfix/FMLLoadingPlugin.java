@@ -1,21 +1,17 @@
 package io.prplz.memoryfix;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 
 import java.util.Map;
 
+@MCVersion("1.8.9")
+@SortingIndex(1001)
 public class FMLLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        if (!VersionUtil.is1_8_X()) {
-            System.out.println("***********************************");
-            System.out.println("");
-            System.out.println("MemoryFix only supports 1.8.x! Bye!");
-            System.out.println("");
-            System.out.println("***********************************");
-            return null;
-        }
         return new String[]{
                 ClassTransformer.class.getName()
         };
@@ -23,10 +19,7 @@ public class FMLLoadingPlugin implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        if (!VersionUtil.is1_8_X()) {
-            return null;
-        }
-        return MemoryFix.class.getName();
+        return null;
     }
 
     @Override

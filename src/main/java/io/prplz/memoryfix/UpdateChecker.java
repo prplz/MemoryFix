@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumTypeAdapterFactory;
 import net.minecraft.util.IChatComponent;
+import net.minecraftforge.common.ForgeVersion;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -71,6 +72,11 @@ public class UpdateChecker extends Thread {
         try {
             con = (HttpURLConnection) new URL(url).openConnection();
             con.setRequestMethod("GET");
+            String agent = "Java/" + System.getProperty("java.version") + " " +
+                    "Forge/" + ForgeVersion.getVersion() + " " +
+                    System.getProperty("os.name") + " " +
+                    System.getProperty("os.arch") + " ";
+            con.setRequestProperty("User-Agent", agent);
 
             int response = con.getResponseCode();
             if (response == 200) {

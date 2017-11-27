@@ -10,6 +10,9 @@ public class ResourcePackImageScaler {
     public static final int SIZE = 64;
 
     public static BufferedImage scalePackImage(BufferedImage image) throws IOException {
+        if (image == null) {
+            return null;
+        }
         System.out.println("Scaling resource pack icon from " + image.getWidth() + " to " + SIZE);
         BufferedImage smallImage = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics graphics = smallImage.getGraphics();

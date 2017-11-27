@@ -37,17 +37,17 @@ public class ClassTransformer implements IClassTransformer {
     private byte[] transformMethods(byte[] bytes, BiConsumer<ClassNode, MethodNode> transformer) {
         ClassReader classReader = new ClassReader(bytes);
         ClassNode classNode = new ClassNode();
-        classReader.accept(classNode, ClassReader.EXPAND_FRAMES);
+        classReader.accept(classNode, 0);
 
         classNode.methods.forEach(m -> transformer.accept(classNode, m));
 
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(0);
         classNode.accept(classWriter);
         return classWriter.toByteArray();
     }
 
     private byte[] transformCapeUtils(byte[] bytes) {
-        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+        ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         RemappingClassAdapter adapter = new RemappingClassAdapter(classWriter, new Remapper() {
             @Override
@@ -82,12 +82,7 @@ public class ClassTransformer implements IClassTransformer {
     }
 
     private void transformAbstractResourcePack(ClassNode clazz, MethodNode method) {
-        if (DeobfUtil.matchMethod(
-                clazz,
-                method,
-                "func_110586_a",
-                "getPackImage",
-                "()Ljava/awt/image/BufferedImage;")) {
+        if ((method.name.equals("getPackImage") || method.name.equals("func_110586_a")) && method.desc.equals("()Ljava/awt/image/BufferedImage;")) {
             Iterator<AbstractInsnNode> iter = method.instructions.iterator();
             while (iter.hasNext()) {
                 AbstractInsnNode insn = iter.next();
@@ -96,7 +91,8 @@ public class ClassTransformer implements IClassTransformer {
                             Opcodes.INVOKESTATIC,
                             "io.prplz.memoryfix.ResourcePackImageScaler".replace('.', '/'),
                             "scalePackImage",
-                            "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;"));
+                            "(Ljava/awt/image/BufferedImage;)Ljava/awt/image/BufferedImage;",
+                            false));
                 }
             }
         }
