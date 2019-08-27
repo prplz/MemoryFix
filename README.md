@@ -4,7 +4,7 @@ Which issues does it fix?
 ------
 - **Optifine cape leak**: This is the main memory leak, anyone who has played minigames for a few hours would have experienced it. More information: https://github.com/sp614x/optifine/issues/526.
 - **Oversized resource pack icons**: Some users download hundreds of resource packs and some resource pack makers (looking at you Apexay) put huge icons in their resource packs. This adds up and can use hundreds of megabytes of memory for some users.
-- **System.gc() on world change**: Causes world changes to take a few seconds. The same effect can also be achieved by adding the JVM argument `-XX:-DisableExplicitGC`.
+- **System.gc() on world change**: Causes world changes to take a few seconds. The same effect can also be achieved by adding the JVM argument `-XX:+DisableExplicitGC`.
 
 Special thanks
 ------
